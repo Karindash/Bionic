@@ -49,48 +49,70 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
   const currentWord = rsvpWords[currentIndex] || { anchor: '', rest: '', suffix: '' };
 
   return (
-    <div className="rsvp-container">
-      <div className="rsvp-word-display">
-        <span className="bionic-anchor focal-point">{currentWord.anchor}</span>
-        <span className="bionic-rest">{currentWord.rest}{currentWord.suffix}</span>
-      </div>
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div className="rsvp-container" style={{ background: 'var(--color-background-secondary)', boxShadow: 'var(--shadow-md)', marginBottom: '2rem' }}>
+        <div className="rsvp-word-display">
+          <span className="bionic-anchor focal-point">{currentWord.anchor}</span>
+          <span className="bionic-rest">{currentWord.rest}{currentWord.suffix}</span>
+        </div>
 
-      <div style={{ width: '100%', maxWidth: '400px', marginBottom: '1rem' }}>
-        <div style={{ 
-          height: '4px', 
-          background: '#e0e0e0', 
-          borderRadius: '2px',
-          overflow: 'hidden'
-        }}>
+        <div style={{ width: '100%', maxWidth: '500px', marginBottom: '2rem' }}>
           <div style={{ 
-            width: `${(currentIndex / rsvpWords.length) * 100}%`, 
-            height: '100%', 
-            background: 'var(--color-primary)',
-            transition: 'width 0.1s linear'
-          }} />
+            height: '6px', 
+            background: 'var(--color-border-primary)', 
+            borderRadius: '3px',
+            overflow: 'hidden'
+          }}>
+            <div style={{ 
+              width: `${(currentIndex / rsvpWords.length) * 100}%`, 
+              height: '100%', 
+              background: 'var(--color-primary)',
+              transition: 'width 0.1s linear'
+            }} />
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginTop: '0.75rem', textAlign: 'center', fontWeight: 500 }}>
+            {currentIndex} / {rsvpWords.length} words completed
+          </div>
         </div>
-        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginTop: '0.5rem', textAlign: 'center' }}>
-          {currentIndex} / {rsvpWords.length} words
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button className="btn btn-secondary" style={{ padding: '0.75rem' }} onClick={() => setCurrentIndex(Math.max(0, currentIndex - 10))}>
+            ↺ 10
+          </button>
+          <button className="btn" style={{ padding: '0.75rem 2.5rem', fontSize: '1.1rem' }} onClick={togglePlay}>
+            {isPlaying ? '⏸ Pause' : '▶ Play'}
+          </button>
+          <button className="btn btn-secondary" style={{ padding: '0.75rem' }} onClick={() => setCurrentIndex(Math.min(rsvpWords.length - 1, currentIndex + 10))}>
+            10 ↻
+          </button>
+          <button className="btn btn-secondary" style={{ padding: '0.75rem' }} onClick={reset}>Reset</button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <button className="btn btn-secondary" onClick={() => setCurrentIndex(Math.max(0, currentIndex - 10))}>-10</button>
-        <button className="btn" onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</button>
-        <button className="btn btn-secondary" onClick={() => setCurrentIndex(Math.min(rsvpWords.length - 1, currentIndex + 10))}>+10</button>
-        <button className="btn btn-secondary" onClick={reset}>Reset</button>
-      </div>
-
-      <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <span style={{ fontSize: '0.9rem' }}>Speed: {wpm} WPM</span>
-        <input 
-          type="range" 
-          min="100" 
-          max="800" 
-          step="50" 
-          value={wpm} 
-          onChange={(e) => setWpm(parseInt(e.target.value))}
-        />
+      <div className="card">
+        <h3 style={{ fontSize: '1rem', marginBottom: '1.5rem', fontWeight: 600 }}>Settings</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Reading Speed</span>
+              <span style={{ fontSize: '0.9rem', color: 'var(--color-primary)', fontWeight: 700 }}>{wpm} WPM</span>
+            </div>
+            <input 
+              type="range" 
+              className="w-full"
+              min="100" 
+              max="800" 
+              step="50" 
+              value={wpm} 
+              style={{ width: '100%', accentColor: 'var(--color-primary)' }}
+              onChange={(e) => setWpm(parseInt(e.target.value))}
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+            <span style={{ marginRight: '0.5rem' }}>💡</span>
+            Average reading speed is 200-250 WPM. Bionic reading allows for 400+ WPM with practice.
+          </div>
+        </div>
       </div>
     </div>
   );
