@@ -1,0 +1,225 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .reader-wrap { padding: 1.5rem 0; }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .badge { font-size: 12px; background: var(--color-background-info); color: var(--color-text-info); padding: 3px 10px; border-radius: var(--border-radius-md); }
+  .tabs { display: flex; gap: 6px; }
+  .tab { font-size: 13px; padding: 5px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* RSVP */
+  .rsvp-stage { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 2.5rem 1rem; text-align: center; margin-bottom: 1rem; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .rsvp-word { font-size: 42px; font-weight: 400; line-height: 1.2; color: var(--color-text-primary); letter-spacing: -0.5px; }
+  .rsvp-word .b { color: #534AB7; font-weight: 500; }
+  .rsvp-progress { width: 100%; background: var(--color-border-tertiary); border-radius: 99px; height: 3px; margin-bottom: 1rem; }
+  .rsvp-bar { height: 3px; border-radius: 99px; background: #534AB7; transition: width 0.1s; }
+  .rsvp-meta { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 1rem; }
+  .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 1rem; }
+  .ctrl-btn { border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .ctrl-btn:hover { background: var(--color-background-secondary); }
+  .ctrl-btn.primary { background: #534AB7; color: #fff; border-color: #534AB7; }
+  .ctrl-btn.primary:hover { background: #3C3489; }
+  .speed-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--color-text-secondary); }
+  .speed-row input { width: 130px; }
+  .speed-val { font-weight: 500; color: var(--color-text-primary); min-width: 60px; }
+
+  /* Bionic paragraph */
+  .bionic-text { font-size: 17px; line-height: 1.85; color: var(--color-text-primary); background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.5rem; }
+  .bionic-text .bw { font-weight: 500; color: var(--color-text-primary); }
+  .bionic-text .nr { font-weight: 400; color: var(--color-text-secondary); }
+
+  /* Upload zone */
+  .upload-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 2.5rem 1rem; text-align: center; color: var(--color-text-secondary); font-size: 14px; margin-bottom: 1rem; }
+  .upload-zone i { font-size: 32px; display: block; margin-bottom: 10px; color: var(--color-text-tertiary); }
+  .fmt-chips { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .chip { font-size: 11px; border: 0.5px solid var(--color-border-tertiary); border-radius: 99px; padding: 3px 10px; color: var(--color-text-tertiary); }
+
+  /* arch */
+  .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .arch-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }
+  .arch-card i { font-size: 22px; color: #534AB7; display: block; margin-bottom: 8px; }
+  .arch-card h4 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .arch-card p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+</style>
+
+<div class="reader-wrap">
+  <h2 class="sr-only">Bionic RSVP reading demo — interactive reader prototype</h2>
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="title">Bionic Reader</span>
+      <span class="badge">demo</span>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('rsvp')">RSVP mode</button>
+      <button class="tab" onclick="switchTab('bionic')">Bionic text</button>
+      <button class="tab" onclick="switchTab('upload')">Book input</button>
+      <button class="tab" onclick="switchTab('arch')">Stack</button>
+    </div>
+  </div>
+
+  <!-- RSVP panel -->
+  <div class="panel active" id="panel-rsvp">
+    <div class="rsvp-stage">
+      <div id="rsvp-word" class="rsvp-word">Press play</div>
+      <div id="rsvp-ctx" style="font-size:13px;color:var(--color-text-tertiary);margin-top:8px;height:18px;"></div>
+    </div>
+    <div class="rsvp-progress"><div class="rsvp-bar" id="rsvp-bar" style="width:0%"></div></div>
+    <div class="rsvp-meta" id="rsvp-meta">0 / 0 words</div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="rsvpSkip(-10)"><i class="ti ti-skip-back" aria-hidden="true"></i> −10</button>
+      <button class="ctrl-btn primary" id="play-btn" onclick="togglePlay()"><i class="ti ti-player-play" aria-hidden="true"></i> Play</button>
+      <button class="ctrl-btn" onclick="rsvpSkip(10)">+10 <i class="ti ti-skip-forward" aria-hidden="true"></i></button>
+    </div>
+    <div class="controls">
+      <div class="speed-row">
+        <i class="ti ti-bolt" aria-hidden="true"></i>
+        <input type="range" min="60" max="600" step="10" value="250" id="wpm-slider" oninput="setWpm(this.value)">
+        <span class="speed-val" id="wpm-val">250 wpm</span>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-tertiary);text-align:center;margin-top:4px;">Bold = bionic anchor · Purple = focal point</div>
+  </div>
+
+  <!-- Bionic text panel -->
+  <div class="panel" id="panel-bionic">
+    <div class="bionic-text" id="bionic-out"></div>
+    <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-text-secondary);">
+      <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+      Bionic ratio:
+      <input type="range" min="20" max="60" step="5" value="40" id="bio-ratio" oninput="renderBionic()">
+      <span id="bio-ratio-val" style="font-weight:500;color:var(--color-text-primary);">40%</span>
+    </div>
+  </div>
+
+  <!-- Upload panel -->
+  <div class="panel" id="panel-upload">
+    <div class="upload-zone">
+      <i class="ti ti-book-upload" aria-hidden="true"></i>
+      Drop your book file here or click to browse
+      <div class="fmt-chips">
+        <span class="chip">ePub</span>
+        <span class="chip">MOBI</span>
+        <span class="chip">PDF</span>
+        <span class="chip">LaTeX (.tex)</span>
+        <span class="chip">Plain text</span>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7;">
+      <p style="margin-bottom:8px;">In a full SaaS build, the backend would:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:12px;">
+          <strong style="font-size:13px;display:block;margin-bottom:4px;">ePub / MOBI</strong>
+          <code style="font-family:var(--font-mono);font-size:11px;">epub.js</code> or <code style="font-family:var(--font-mono);font-size:11px;">calibre</code> conversion → extract chapters as JSON
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:12px;">
+          <strong style="font-size:13px;display:block;margin-bottom:4px;">LaTeX</strong>
+          Strip commands with <code style="font-family:var(--font-mono);font-size:11px;">pandoc</code> → plain text pipeline
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:12px;">
+          <strong style="font-size:13px;display:block;margin-bottom:4px;">PDF</strong>
+          <code style="font-family:var(--font-mono);font-size:11px;">pdf.js</code> text extraction + layout detection
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:12px;">
+          <strong style="font-size:13px;display:block;margin-bottom:4px;">Bionic engine</strong>
+          Word tokenizer → apply bold to first N% of each word
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stack panel -->
+  <div class="panel" id="panel-arch">
+    <div class="arch-grid">
+      <div class="arch-card"><i class="ti ti-device-laptop" aria-hidden="true"></i><h4>Frontend</h4><p>React + epub.js · Tailwind · Canvas for RSVP display</p></div>
+      <div class="arch-card"><i class="ti ti-server" aria-hidden="true"></i><h4>Backend</h4><p>Node.js / Python · Calibre for format conversion · Pandoc for LaTeX</p></div>
+      <div class="arch-card"><i class="ti ti-brain" aria-hidden="true"></i><h4>Bionic engine</h4><p>Tokenizer · configurable bold ratio · chapter/paragraph segmentation</p></div>
+      <div class="arch-card"><i class="ti ti-bolt" aria-hidden="true"></i><h4>RSVP engine</h4><p>Word queue · WPM timer · focal point centering · pause on punctuation</p></div>
+      <div class="arch-card"><i class="ti ti-palette" aria-hidden="true"></i><h4>Theming</h4><p>Sepia / dark / white · font size · line spacing controls</p></div>
+      <div class="arch-card"><i class="ti ti-cloud" aria-hidden="true"></i><h4>Storage</h4><p>S3 for books · Postgres for library · Redis for reading position</p></div>
+    </div>
+    <button class="ctrl-btn" style="margin-top:1rem;" onclick="sendPrompt('Give me a detailed tech stack plan and file structure for building this bionic RSVP reader SaaS')">Full tech plan ↗</button>
+  </div>
+</div>
+
+<script>
+const sampleText = "Bionic reading combines two powerful techniques to accelerate comprehension. The first is rapid serial visual presentation, which flashes words one at a time at a controlled pace. The second is bionic highlighting, which bolds the first portion of each word so your brain recognizes it faster. Together they reduce subvocalization and eye movement, letting you read at speeds previously impossible. Many readers report retaining more information because focus is enforced rather than optional. You can adjust the word-per-minute rate and the bionic ratio to find your personal sweet spot.";
+
+const words = sampleText.split(/\s+/);
+let idx = 0, playing = false, timer = null, wpm = 250;
+
+function bionicWord(w, ratio) {
+  const punct = w.match(/[.,!?;:'")\]]+$/)?.[0] || '';
+  const clean = w.replace(/[.,!?;:'")\]]+$/, '');
+  const n = Math.max(1, Math.round(clean.length * (ratio / 100)));
+  return `<span class="b">${clean.slice(0,n)}</span>${clean.slice(n)}${punct}`;
+}
+
+function showWord(i) {
+  if (i < 0) i = 0;
+  if (i >= words.length) { stopPlay(); idx = 0; updateMeta(); return; }
+  idx = i;
+  const w = words[i];
+  document.getElementById('rsvp-word').innerHTML = bionicWord(w, 40);
+  const ctx = words.slice(Math.max(0,i-2), i).join(' ') + ' <span style="opacity:.3">|</span> ' + words.slice(i+1, i+3).join(' ');
+  document.getElementById('rsvp-ctx').innerHTML = ctx;
+  updateMeta();
+}
+
+function updateMeta() {
+  const pct = words.length ? (idx / words.length * 100).toFixed(0) : 0;
+  document.getElementById('rsvp-meta').textContent = `${idx} / ${words.length} words`;
+  document.getElementById('rsvp-bar').style.width = pct + '%';
+}
+
+function startPlay() {
+  playing = true;
+  document.getElementById('play-btn').innerHTML = '<i class="ti ti-player-pause" aria-hidden="true"></i> Pause';
+  const delay = Math.round(60000 / wpm);
+  timer = setInterval(() => { showWord(idx + 1); }, delay);
+}
+
+function stopPlay() {
+  playing = false;
+  clearInterval(timer);
+  document.getElementById('play-btn').innerHTML = '<i class="ti ti-player-play" aria-hidden="true"></i> Play';
+}
+
+function togglePlay() { playing ? stopPlay() : startPlay(); }
+
+function rsvpSkip(n) { stopPlay(); showWord(idx + n); }
+
+function setWpm(v) {
+  wpm = parseInt(v);
+  document.getElementById('wpm-val').textContent = wpm + ' wpm';
+  if (playing) { stopPlay(); startPlay(); }
+}
+
+function renderBionic() {
+  const ratio = parseInt(document.getElementById('bio-ratio').value);
+  document.getElementById('bio-ratio-val').textContent = ratio + '%';
+  const html = sampleText.split(/\s+/).map(w => {
+    const punct = w.match(/[.,!?;:'")\]]+$/)?.[0] || '';
+    const clean = w.replace(/[.,!?;:'")\]]+$/, '');
+    const n = Math.max(1, Math.round(clean.length * (ratio / 100)));
+    return `<span class="bw">${clean.slice(0,n)}</span><span class="nr">${clean.slice(n)}${punct}</span>`;
+  }).join(' ');
+  document.getElementById('bionic-out').innerHTML = html;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['rsvp','bionic','upload','arch'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'bionic') renderBionic();
+}
+
+showWord(0);
+renderBionic();
+</script>
