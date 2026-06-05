@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useBionic, BionicWord } from '../hooks/useBionic';
+import { useBionic, BionicWord } from '../../hooks/useBionic';
 
 interface SpeedReaderProps {
   text: string;

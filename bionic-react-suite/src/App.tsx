@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './styles/theme.css';
-import { SpeedReader } from './components/SpeedReader';
-import { DocReader } from './components/DocReader';
-import { BionicConverter } from './components/BionicConverter';
-import { Dashboard } from './components/Dashboard';
+import { SpeedReader } from './components/animated_reader/SpeedReader';
+import { DocReader } from './components/file_handler/DocReader';
+import { BionicConverter } from './components/master_feature/BionicConverter';
+import { Dashboard } from './components/dashboard/Dashboard';
+import { Library } from './components/file_handler/Library';
 
 const SAMPLE_TEXT = `Bionic reading combines two powerful techniques to accelerate comprehension. The first is rapid serial visual presentation (RSVP), which flashes words one at a time at a controlled pace. 
 
@@ -11,19 +12,29 @@ The second is bionic highlighting, which bolds the first portion of each word so
 
 Many readers report retaining more information because focus is enforced rather than optional. You can adjust the word-per-minute rate and the bionic ratio to find your personal sweet spot.`;
 
-type View = 'dashboard' | 'rsvp' | 'doc' | 'converter';
+type View = 'dashboard' | 'library' | 'rsvp' | 'doc' | 'converter';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<View>('dashboard');
+  const [currentText, setCurrentText] = useState(SAMPLE_TEXT);
+  const [currentTitle, setCurrentTitle] = useState('Introduction to Bionic Reading');
+
+  const handleSelectFile = (text: string, title: string) => {
+    setCurrentText(text);
+    setCurrentTitle(title);
+    setActiveTab('doc'); // Default to Doc Reader when opening a file
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard onNavigate={setActiveTab} />;
+      case 'library':
+        return <Library onSelectFile={handleSelectFile} />;
       case 'rsvp':
-        return <SpeedReader text={SAMPLE_TEXT} />;
+        return <SpeedReader text={currentText} />;
       case 'doc':
-        return <DocReader text={SAMPLE_TEXT} />;
+        return <DocReader text={currentText} />;
       case 'converter':
         return <BionicConverter />;
       default:
@@ -34,8 +45,9 @@ export default function App() {
   const getTitle = () => {
     switch (activeTab) {
       case 'dashboard': return 'Dashboard';
-      case 'rsvp': return 'RSVP Speed Reader';
-      case 'doc': return 'Long-Form Reader';
+      case 'library': return 'My Library';
+      case 'rsvp': return currentTitle || 'RSVP Speed Reader';
+      case 'doc': return currentTitle || 'Long-Form Reader';
       case 'converter': return 'Text Converter';
       default: return 'Bionic Reader';
     }
@@ -55,6 +67,12 @@ export default function App() {
               onClick={() => setActiveTab('dashboard')}
             >
               📊 Dashboard
+            </li>
+            <li 
+              className={`nav-item ${activeTab === 'library' ? 'active' : ''}`}
+              onClick={() => setActiveTab('library')}
+            >
+              📚 My Library
             </li>
             <li 
               className={`nav-item ${activeTab === 'rsvp' ? 'active' : ''}`}

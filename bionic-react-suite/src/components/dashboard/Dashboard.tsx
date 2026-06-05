@@ -1,7 +1,9 @@
 import React from 'react';
 
+type View = 'dashboard' | 'library' | 'rsvp' | 'doc' | 'converter';
+
 interface DashboardProps {
-  onNavigate: (tab: 'rsvp' | 'doc' | 'converter') => void;
+  onNavigate: (tab: View) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
@@ -42,7 +44,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <div style={{ fontWeight: 500 }}>{item.title}</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>{item.date} • {item.type}</div>
                 </div>
-                <button className="btn btn-secondary" style={{ fontSize: '0.8rem' }}>Open</button>
+                <button className="btn btn-secondary" style={{ fontSize: '0.8rem' }} onClick={() => onNavigate('doc')}>Open</button>
               </div>
             ))}
           </div>
@@ -51,6 +53,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="card" style={{ background: 'var(--color-primary)', color: 'white' }}>
           <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Quick Actions</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button 
+              className="btn" 
+              style={{ background: 'rgba(255,255,255,0.1)', textAlign: 'left', justifyContent: 'flex-start' }}
+              onClick={() => onNavigate('library')}
+            >
+              📚 Open My Library
+            </button>
             <button 
               className="btn" 
               style={{ background: 'rgba(255,255,255,0.1)', textAlign: 'left', justifyContent: 'flex-start' }}
@@ -64,13 +73,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               onClick={() => onNavigate('doc')}
             >
               📖 Open Doc Reader
-            </button>
-            <button 
-              className="btn" 
-              style={{ background: 'rgba(255,255,255,0.1)', textAlign: 'left', justifyContent: 'flex-start' }}
-              onClick={() => onNavigate('converter')}
-            >
-              🔄 Text Converter
             </button>
           </div>
         </div>

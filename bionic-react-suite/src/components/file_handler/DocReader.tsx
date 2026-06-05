@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useBionic } from '../hooks/useBionic';
+import { useBionic } from '../../hooks/useBionic';
 
 interface DocReaderProps {
   text: string;

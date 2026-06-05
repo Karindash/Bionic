@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useBionic } from '../hooks/useBionic';
+import { useBionic } from '../../hooks/useBionic';
 
 export const BionicConverter: React.FC = () => {
   const [inputText, setInputText] = useState("Paste your text here to convert it into Bionic Reading format. You can then copy the HTML or Markdown for use in your own documents or apps.");

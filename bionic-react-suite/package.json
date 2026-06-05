@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@lingo-reader/mobi-parser": "^0.4.6",
+    "epubjs": "^0.3.93",
+    "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
