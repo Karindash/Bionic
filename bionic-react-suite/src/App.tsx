@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import './styles/theme.css';
-import { SpeedReader } from './components/animated_reader/SpeedReader';
-import { DocReader } from './components/file_handler/DocReader';
-import { BionicConverter } from './components/master_feature/BionicConverter';
-import { Dashboard } from './components/dashboard/Dashboard';
-import { Library } from './components/file_handler/Library';
+import { SpeedReader } from './features/animated_reader/SpeedReader';
+import { DocReader } from './features/file_handler/DocReader';
+import { BionicConverter } from './features/master_feature/BionicConverter';
+import { Dashboard } from './features/dashboard/Dashboard';
+import { Library } from './features/file_handler/Library';
+import { Sidebar, NavConfig } from './components/organisms/Sidebar';
+import { Header } from './components/organisms/Header';
 
 const SAMPLE_TEXT = `Bionic reading combines two powerful techniques to accelerate comprehension. The first is rapid serial visual presentation (RSVP), which flashes words one at a time at a controlled pace. 
 
@@ -19,99 +21,62 @@ export default function App() {
   const [currentText, setCurrentText] = useState(SAMPLE_TEXT);
   const [currentTitle, setCurrentTitle] = useState('Introduction to Bionic Reading');
 
+  const navigation: NavConfig<View>[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'library', label: 'My Library', icon: '📚' },
+    { id: 'rsvp', label: 'Speed Reader', icon: '🚀' },
+    { id: 'doc', label: 'Long-Form', icon: '📖' },
+    { id: 'converter', label: 'Converter', icon: '🔄' },
+  ];
+
+  const user = {
+    name: 'Alex Reader',
+    initials: 'AR',
+    role: 'Premium User',
+    avatarColor: 'var(--color-primary)'
+  };
+
   const handleSelectFile = (text: string, title: string) => {
     setCurrentText(text);
     setCurrentTitle(title);
-    setActiveTab('doc'); // Default to Doc Reader when opening a file
+    setActiveTab('doc');
   };
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard onNavigate={setActiveTab} />;
-      case 'library':
-        return <Library onSelectFile={handleSelectFile} />;
-      case 'rsvp':
-        return <SpeedReader text={currentText} />;
-      case 'doc':
-        return <DocReader text={currentText} />;
-      case 'converter':
-        return <BionicConverter />;
-      default:
-        return <Dashboard onNavigate={setActiveTab} />;
+      case 'dashboard': return <Dashboard onNavigate={setActiveTab} />;
+      case 'library': return <Library onSelectFile={handleSelectFile} />;
+      case 'rsvp': return <SpeedReader text={currentText} />;
+      case 'doc': return <DocReader text={currentText} />;
+      case 'converter': return <BionicConverter />;
+      default: return <Dashboard onNavigate={setActiveTab} />;
     }
   };
 
   const getTitle = () => {
-    switch (activeTab) {
-      case 'dashboard': return 'Dashboard';
-      case 'library': return 'My Library';
-      case 'rsvp': return currentTitle || 'RSVP Speed Reader';
-      case 'doc': return currentTitle || 'Long-Form Reader';
-      case 'converter': return 'Text Converter';
-      default: return 'Bionic Reader';
-    }
+    const activeNav = navigation.find(n => n.id === activeTab);
+    if (activeTab === 'rsvp' || activeTab === 'doc') return currentTitle || activeNav?.label || 'Reader';
+    return activeNav?.label || 'Bionic Reader';
   };
 
   return (
     <div className="app-layout">
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <span style={{ fontSize: '1.5rem' }}>⚡</span>
-          <span>Bionic Suite</span>
-        </div>
-        <nav>
-          <ul className="nav-list">
-            <li 
-              className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              📊 Dashboard
-            </li>
-            <li 
-              className={`nav-item ${activeTab === 'library' ? 'active' : ''}`}
-              onClick={() => setActiveTab('library')}
-            >
-              📚 My Library
-            </li>
-            <li 
-              className={`nav-item ${activeTab === 'rsvp' ? 'active' : ''}`}
-              onClick={() => setActiveTab('rsvp')}
-            >
-              🚀 Speed Reader
-            </li>
-            <li 
-              className={`nav-item ${activeTab === 'doc' ? 'active' : ''}`}
-              onClick={() => setActiveTab('doc')}
-            >
-              📖 Long-Form
-            </li>
-            <li 
-              className={`nav-item ${activeTab === 'converter' ? 'active' : ''}`}
-              onClick={() => setActiveTab('converter')}
-            >
-              🔄 Converter
-            </li>
-          </ul>
-        </nav>
-        
-        <div style={{ marginTop: 'auto', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--border-radius-md)', fontSize: '0.8rem' }}>
-          <div style={{ color: 'white', fontWeight: 600 }}>Pro Plan</div>
-          <div style={{ color: 'var(--color-sidebar-text)' }}>Unlimited conversions</div>
-        </div>
-      </aside>
+      <Sidebar 
+        activeId={activeTab} 
+        onNavigate={setActiveTab} 
+        navigation={navigation}
+        footer={{
+          title: 'Pro Plan',
+          subtitle: 'Unlimited conversions',
+          badge: 'Active'
+        }}
+      />
 
       <main className="main-content">
-        <header className="top-header">
-          <h1 style={{ fontSize: '1.1rem', fontWeight: 600 }}>{getTitle()}</h1>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>Alex Reader</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Premium User</div>
-            </div>
-            <div style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.8rem' }}>AR</div>
-          </div>
-        </header>
+        <Header 
+          title={getTitle()} 
+          user={user}
+        />
 
         <div className="content-body">
           {renderContent()}

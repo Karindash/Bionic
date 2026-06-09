@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useBionic } from '../../hooks/useBionic';
+import { Card } from '../../components/atoms/Card';
+import { Button } from '../../components/atoms/Button';
+import { RangeInput } from '../../components/atoms/RangeInput';
+import { BionicWord } from '../../components/molecules/BionicWord';
 
 export const BionicConverter: React.FC = () => {
   const [inputText, setInputText] = useState("Paste your text here to convert it into Bionic Reading format. You can then copy the HTML or Markdown for use in your own documents or apps.");
@@ -26,25 +30,19 @@ export const BionicConverter: React.FC = () => {
   };
 
   return (
-    <div className="card" style={{ padding: '0' }}>
+    <Card padding="0">
       <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Text Converter</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', width: '150px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600 }}>
-              <span>Ratio</span>
-              <span style={{ color: 'var(--color-primary)' }}>{ratio}%</span>
-            </div>
-            <input 
-              type="range" 
-              min="20" 
-              max="60" 
-              step="5" 
-              value={ratio} 
-              style={{ accentColor: 'var(--color-primary)' }}
-              onChange={(e) => setRatio(parseInt(e.target.value))}
-            />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '200px' }}>
+          <RangeInput 
+            label="Ratio" 
+            value={ratio} 
+            min={20} 
+            max={60} 
+            step={5} 
+            unit="%" 
+            onChange={setRatio} 
+          />
         </div>
       </div>
       
@@ -65,19 +63,21 @@ export const BionicConverter: React.FC = () => {
             {processedWords.map((word, i) => {
               if (/^\s+$/.test(word.original)) return <span key={i}>{word.original}</span>;
               return (
-                <span key={i}>
-                  <span className="bionic-anchor">{word.anchor}</span>
-                  <span>{word.rest}{word.suffix}</span>
-                </span>
+                <BionicWord 
+                  key={i} 
+                  anchor={word.anchor} 
+                  rest={word.rest} 
+                  suffix={word.suffix} 
+                />
               );
             })}
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button className="btn" style={{ flex: 1 }} onClick={() => copyToClipboard(generateHTML())}>Copy HTML</button>
-            <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => copyToClipboard(generateMarkdown())}>Copy Markdown</button>
+            <Button fullWidth onClick={() => copyToClipboard(generateHTML())}>Copy HTML</Button>
+            <Button variant="secondary" fullWidth onClick={() => copyToClipboard(generateMarkdown())}>Copy Markdown</Button>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

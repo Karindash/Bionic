@@ -43,52 +43,50 @@ const parseEPUB = async (file: File): Promise<string> => {
   await book.ready;
   
   let fullText = '';
-  const spine = await book.spine;
+  // book.spine.items contains the sections of the book
+  const items = (book.spine as any).items || [];
   
-  // Iterate through spine items to extract text
-  // This is a simplified version, EPUBs are complex
-  for (const item of spine.items) {
-    const doc = await item.load(book.load.bind(book));
-    if (doc instanceof Document) {
-      fullText += doc.body.innerText + '\n\n';
+  for (const item of items) {
+    try {
+      const doc = await item.load(book.load.bind(book));
+      // Use innerText if available (better for layout), fallback to textContent
+      const text = doc.body ? doc.body.innerText : (doc.textContent || '');
+      fullText += text + '\n\n';
+      item.unload();
+    } catch (e) {
+      console.warn('Failed to load EPUB section:', e);
     }
-    item.unload();
   }
 
   return fullText;
 };
 
 const parseMOBI = async (file: File): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-
-  // Dynamically import the mobi parser and try a few common export names
-  const mod = await import('@lingo-reader/mobi-parser');
-  const ParserClass: any = mod.default || mod.MobiParser || mod.EBookParser || mod.Parser;
-
-  if (!ParserClass) {
-    throw new Error('MOBI parser not found in @lingo-reader/mobi-parser');
-  }
-
-  // Some libraries expect the raw buffer, others expect an object; try to handle common APIs
-  let content: any;
+  // v0.4.6+ uses initMobiFile which returns a Mobi instance
+  const { initMobiFile } = await import('@lingo-reader/mobi-parser');
+  
   try {
-    const parserInstance = new ParserClass(arrayBuffer);
-    if (typeof parserInstance.parse === 'function') {
-      content = await parserInstance.parse();
-    } else if (typeof parserInstance.get === 'function') {
-      content = await parserInstance.get();
+    const mobi = await initMobiFile(file);
+    const spine = mobi.getSpine();
+    
+    let fullText = '';
+    for (const item of spine) {
+      // Each spine item has an id that can be loaded
+      const { html } = await mobi.loadChapter(item.id);
+      
+      // Convert HTML to plain text
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      fullText += (tempDiv.innerText || tempDiv.textContent || '') + '\n\n';
     }
-  } catch (e) {
-    // Fallback: maybe the parser exposes a parse function directly
-    if (typeof ParserClass.parse === 'function') {
-      content = await ParserClass.parse(arrayBuffer);
-    } else {
-      throw e;
-    }
-  }
 
-  // Convert HTML content to plain text
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = (content && (content.html || content.content || content.body)) || '';
-  return tempDiv.innerText || tempDiv.textContent || '';
+    if (typeof mobi.destroy === 'function') {
+      mobi.destroy();
+    }
+
+    return fullText;
+  } catch (error) {
+    console.error('MOBI parsing failed:', error);
+    throw new Error('Failed to parse MOBI file. The format might be encrypted or corrupted.');
+  }
 };

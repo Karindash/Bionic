@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { parseFile } from '../../utils/FileParser';
+import { Card } from '../../components/atoms/Card';
+import { Button } from '../../components/atoms/Button';
+import { Badge } from '../../components/atoms/Badge';
 
 interface LibraryProps {
   onSelectFile: (text: string, title: string) => void;
@@ -58,13 +61,12 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>My Library</h2>
-        <button 
-          className="btn" 
+        <Button 
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
         >
           {isUploading ? '⌛ Parsing...' : '➕ Upload Book'}
-        </button>
+        </Button>
         <input 
           type="file" 
           ref={fileInputRef} 
@@ -80,7 +82,7 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
         </div>
       )}
 
-      <div className="card" style={{ padding: '0' }}>
+      <Card padding="0">
         <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-tertiary)', display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr' }}>
           <span>Title</span>
           <span>Format</span>
@@ -96,19 +98,17 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
                 {book.title}
               </div>
               <div style={{ fontSize: '0.85rem' }}>
-                <span style={{ padding: '0.2rem 0.5rem', background: 'var(--color-background-primary)', borderRadius: '4px', border: '1px solid var(--color-border-primary)', fontWeight: 600, fontSize: '0.75rem' }}>
-                  {book.format}
-                </span>
+                <Badge variant="outline">{book.format}</Badge>
               </div>
               <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>{book.dateAdded}</div>
               <div style={{ textAlign: 'right' }}>
-                <button 
-                  className="btn btn-secondary" 
-                  style={{ fontSize: '0.8rem' }}
+                <Button 
+                  variant="secondary" 
+                  style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
                   onClick={() => onSelectFile(book.text, book.title)}
                 >
                   Read
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -120,7 +120,7 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       <style>{`
         .library-item:hover {
