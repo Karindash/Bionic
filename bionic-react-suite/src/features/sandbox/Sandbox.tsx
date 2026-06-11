@@ -45,6 +45,8 @@ export const Sandbox: React.FC = () => {
           <h3 style={{ marginBottom: '1rem' }}>Upload for Instant Preview</h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', marginBottom: '1.5rem' }}>
             Supports PDF, EPUB, MOBI, and AZW3. (Max 50MB)
+            <br />
+            <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>✨ Enhanced PNG/Image detection active</span>
           </p>
           
           <input 

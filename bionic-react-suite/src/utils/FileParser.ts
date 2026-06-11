@@ -57,22 +57,61 @@ const htmlToPlainText = (html: string): string => {
 
 const parseEPUB = async (file: File): Promise<string> => {
   const arrayBuffer = await file.arrayBuffer();
-  const book = ePub(arrayBuffer);
+  // With the alias, ePub might be a function or have a default export
+  const ePubModule: any = ePub;
+  const book = (typeof ePubModule === 'function') ? ePubModule(arrayBuffer) : (ePubModule.default ? ePubModule.default(arrayBuffer) : ePub(arrayBuffer));
+  
   await book.ready;
   
   let fullText = '';
-  // epubjs spine handling
-  const items = (book.spine as any).items || [];
+  // In epubjs v0.3, spineItems is the reliable array of Section objects
+  const sections = (book.spine as any).spineItems || [];
   
-  for (const item of items) {
+  for (const section of sections) {
     try {
-      const doc = await item.load(book.load.bind(book));
-      const html = doc.body ? doc.body.innerHTML : (doc.innerHTML || '');
-      fullText += htmlToPlainText(html) + '\n\n';
-      item.unload();
+      const doc = await section.load(book.load.bind(book));
+      if (!doc) continue;
+
+      // doc might be a Document or an Element; handle both safely
+      const container = doc.body || (typeof doc.querySelectorAll === 'function' ? doc : null);
+      if (!container) continue;
+
+      // Handle block-level elements for spacing
+      const blocks = ['p', 'div', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'tr'];
+      blocks.forEach(tag => {
+        const elements = container.querySelectorAll(tag);
+        elements.forEach((el: any) => {
+          // Use global document to create nodes safely
+          const newline = document.createTextNode('\n\n');
+          el.parentNode?.insertBefore(newline, el.nextSibling);
+        });
+      });
+
+      // Special handling for images: convert to placeholders
+      const images = container.querySelectorAll('img');
+      images.forEach((img: any) => {
+        const alt = img.alt || 'Image';
+        const placeholder = document.createTextNode(`\n[${alt} - PNG/JPG]\n`);
+        img.parentNode?.replaceChild(placeholder, img);
+      });
+
+      // Extract text safely
+      let sectionText = '';
+      if (doc.body) {
+        sectionText = doc.body.innerText || doc.body.textContent || '';
+      } else if (typeof doc.textContent === 'string') {
+        sectionText = doc.textContent;
+      }
+
+      fullText += sectionText + '\n\n';
+      section.unload();
     } catch (e) {
       console.warn('Failed to load EPUB section:', e);
     }
+  }
+
+  if (typeof (book as any).destroy === 'function') {
+    (book as any).destroy();
   }
 
   return fullText;

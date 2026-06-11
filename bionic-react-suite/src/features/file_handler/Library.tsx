@@ -3,31 +3,17 @@ import { parseFile } from '../../utils/FileParser';
 import { Card } from '../../components/atoms/Card';
 import { Button } from '../../components/atoms/Button';
 import { Badge } from '../../components/atoms/Badge';
+import { Book } from '../../types';
 
 interface LibraryProps {
+  books: Book[];
+  setBooks: React.Dispatch<React.SetStateAction<Book[]>>;
   onSelectFile: (text: string, title: string) => void;
 }
 
-interface Book {
-  id: string;
-  title: string;
-  format: string;
-  text: string;
-  dateAdded: string;
-}
-
-export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
+export const Library: React.FC<LibraryProps> = ({ books, setBooks, onSelectFile }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [books, setBooks] = useState<Book[]>([
-    { 
-      id: '1', 
-      title: 'Sample: Bionic Reading Guide', 
-      format: 'PDF', 
-      text: 'Bionic reading combines two powerful techniques to accelerate comprehension...', 
-      dateAdded: 'Today' 
-    }
-  ]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,10 +36,16 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
       setBooks(prev => [newBook, ...prev]);
     } catch (err) {
       console.error(err);
-      setError('Failed to parse file. Please ensure it is a valid PDF, EPUB, or MOBI.');
+      setError('Failed to parse file. Please ensure it is a valid PDF, EPUB, MOBI, or AZW3.');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeBook = (id: string) => {
+    if (window.confirm('Are you sure you want to remove this book?')) {
+      setBooks(prev => prev.filter(b => b.id !== id));
     }
   };
 
@@ -83,7 +75,7 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
       )}
 
       <Card padding="0">
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-tertiary)', display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr' }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-tertiary)', display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1.5fr' }}>
           <span>Title</span>
           <span>Format</span>
           <span>Date Added</span>
@@ -92,7 +84,7 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
         
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {books.map((book) => (
-            <div key={book.id} style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border-primary)', display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr', alignItems: 'center', transition: 'background 0.2s' }} className="library-item">
+            <div key={book.id} style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--color-border-primary)', display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1.5fr', alignItems: 'center', transition: 'background 0.2s' }} className="library-item">
               <div style={{ fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{ fontSize: '1.25rem' }}>{book.format === 'PDF' ? '📄' : '📚'}</span>
                 {book.title}
@@ -101,13 +93,20 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
                 <Badge variant="outline">{book.format}</Badge>
               </div>
               <div style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>{book.dateAdded}</div>
-              <div style={{ textAlign: 'right' }}>
+              <div style={{ textAlign: 'right', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <Button 
                   variant="secondary" 
                   style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
                   onClick={() => onSelectFile(book.text, book.title)}
                 >
                   Read
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', color: '#ef4444' }}
+                  onClick={() => removeBook(book.id)}
+                >
+                  Delete
                 </Button>
               </div>
             </div>

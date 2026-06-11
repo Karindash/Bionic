@@ -8,12 +8,13 @@ import { Progress } from '../../components/atoms/Progress';
 
 interface DocReaderProps {
   text: string;
+  onComplete?: () => void;
 }
 
 const WORDS_PER_PAGE = 250;
 const AUTO_ADVANCE_TIME = 10000; // 10 seconds
 
-export const DocReader: React.FC<DocReaderProps> = ({ text }) => {
+export const DocReader: React.FC<DocReaderProps> = ({ text, onComplete }) => {
   const [ratio, setRatio] = useState(40);
   const [currentPage, setCurrentPage] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(false);
@@ -33,13 +34,18 @@ export const DocReader: React.FC<DocReaderProps> = ({ text }) => {
     let timer: NodeJS.Timeout;
     if (autoAdvance && currentPage < pages.length - 1) {
       timer = setTimeout(() => {
-        setCurrentPage(prev => prev + 1);
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
         setShowNotification(true);
         setTimeout(() => setShowNotification(false), 2000);
+        
+        if (nextPage === pages.length - 1 && onComplete) {
+          onComplete();
+        }
       }, AUTO_ADVANCE_TIME);
     }
     return () => clearTimeout(timer);
-  }, [autoAdvance, currentPage, pages.length]);
+  }, [autoAdvance, currentPage, pages.length, onComplete]);
 
   const currentWords = pages[currentPage] || [];
   const progressPercent = ((currentPage + 1) / pages.length) * 100;

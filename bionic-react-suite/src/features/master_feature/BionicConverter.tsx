@@ -5,7 +5,11 @@ import { Button } from '../../components/atoms/Button';
 import { RangeInput } from '../../components/atoms/RangeInput';
 import { BionicWord } from '../../components/molecules/BionicWord';
 
-export const BionicConverter: React.FC = () => {
+interface BionicConverterProps {
+  onConvert?: () => void;
+}
+
+export const BionicConverter: React.FC<BionicConverterProps> = ({ onConvert }) => {
   const [inputText, setInputText] = useState("Paste your text here to convert it into Bionic Reading format. You can then copy the HTML or Markdown for use in your own documents or apps.");
   const [ratio, setRatio] = useState(40);
   const { processedWords } = useBionic(inputText, ratio);
@@ -26,6 +30,7 @@ export const BionicConverter: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    if (onConvert) onConvert();
     alert("Copied to clipboard!");
   };
 

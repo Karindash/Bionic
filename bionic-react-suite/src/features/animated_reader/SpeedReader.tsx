@@ -8,9 +8,10 @@ import { BionicWord } from '../../components/molecules/BionicWord';
 
 interface SpeedReaderProps {
   text: string;
+  onComplete?: () => void;
 }
 
-export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
+export const SpeedReader: React.FC<SpeedReaderProps> = ({ text, onComplete }) => {
   const [wpm, setWpm] = useState(250);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,7 +32,11 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
       }
 
       timerRef.current = setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        if (nextIndex === rsvpWords.length && onComplete) {
+          onComplete();
+        }
       }, delay);
     } else if (currentIndex >= rsvpWords.length) {
       setIsPlaying(false);
@@ -40,7 +45,7 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isPlaying, currentIndex, wpm, rsvpWords]);
+  }, [isPlaying, currentIndex, wpm, rsvpWords, onComplete]);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   const reset = () => {
@@ -82,25 +87,6 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
           </Button>
           <Button variant="secondary" style={{ padding: '0.75rem' }} onClick={reset}>Reset</Button>
         </div>
-
-        <div style={{padding: '1fr'}}></div>
-        <RangeInput 
-            label="Reading Speed" 
-            value={wpm} 
-            min={100} 
-            max={800} 
-            step={50} 
-            unit=" WPM" 
-            onChange={setWpm} 
-          />
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', margin: 'auto'}}>
-          
-          {/* <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
-            <span style={{ marginRight: '0.5rem' }}>💡</span>
-            Average reading speed is 200-250 WPM. Bionic reading allows for 400+ WPM with practice.
-          </div> */}
-        </div>
       </div>
 
       <Card>
@@ -115,10 +101,10 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
             unit=" WPM" 
             onChange={setWpm} 
           />
-          {/* <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
             <span style={{ marginRight: '0.5rem' }}>💡</span>
             Average reading speed is 200-250 WPM. Bionic reading allows for 400+ WPM with practice.
-          </div> */}
+          </div>
         </div>
       </Card>
     </div>
