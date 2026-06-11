@@ -5,6 +5,7 @@ import { DocReader } from './features/file_handler/DocReader';
 import { BionicConverter } from './features/master_feature/BionicConverter';
 import { Dashboard } from './features/dashboard/Dashboard';
 import { Library } from './features/file_handler/Library';
+import { Sandbox } from './features/sandbox/Sandbox';
 import { Sidebar, NavConfig } from './components/organisms/Sidebar';
 import { Header } from './components/organisms/Header';
 
@@ -14,7 +15,7 @@ The second is bionic highlighting, which bolds the first portion of each word so
 
 Many readers report retaining more information because focus is enforced rather than optional. You can adjust the word-per-minute rate and the bionic ratio to find your personal sweet spot.`;
 
-type View = 'dashboard' | 'library' | 'rsvp' | 'doc' | 'converter';
+type View = 'dashboard' | 'library' | 'rsvp' | 'doc' | 'converter' | 'sandbox';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<View>('dashboard');
@@ -27,6 +28,7 @@ export default function App() {
     { id: 'rsvp', label: 'Speed Reader', icon: '🚀' },
     { id: 'doc', label: 'Long-Form', icon: '📖' },
     { id: 'converter', label: 'Converter', icon: '🔄' },
+    { id: 'sandbox', label: 'Sandbox', icon: '🧪' },
   ];
 
   const user = {
@@ -49,6 +51,7 @@ export default function App() {
       case 'rsvp': return <SpeedReader text={currentText} />;
       case 'doc': return <DocReader text={currentText} />;
       case 'converter': return <BionicConverter />;
+      case 'sandbox': return <Sandbox />;
       default: return <Dashboard onNavigate={setActiveTab} />;
     }
   };

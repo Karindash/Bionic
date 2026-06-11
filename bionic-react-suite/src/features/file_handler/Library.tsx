@@ -71,7 +71,7 @@ export const Library: React.FC<LibraryProps> = ({ onSelectFile }) => {
           type="file" 
           ref={fileInputRef} 
           style={{ display: 'none' }} 
-          accept=".pdf,.epub,.mobi" 
+          accept=".pdf,.epub,.mobi,.azw3" 
           onChange={handleFileUpload}
         />
       </div>

@@ -82,6 +82,25 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
           </Button>
           <Button variant="secondary" style={{ padding: '0.75rem' }} onClick={reset}>Reset</Button>
         </div>
+
+        <div style={{padding: '1fr'}}></div>
+        <RangeInput 
+            label="Reading Speed" 
+            value={wpm} 
+            min={100} 
+            max={800} 
+            step={50} 
+            unit=" WPM" 
+            onChange={setWpm} 
+          />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', margin: 'auto'}}>
+          
+          {/* <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+            <span style={{ marginRight: '0.5rem' }}>💡</span>
+            Average reading speed is 200-250 WPM. Bionic reading allows for 400+ WPM with practice.
+          </div> */}
+        </div>
       </div>
 
       <Card>
@@ -96,10 +115,10 @@ export const SpeedReader: React.FC<SpeedReaderProps> = ({ text }) => {
             unit=" WPM" 
             onChange={setWpm} 
           />
-          <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+          {/* <div style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
             <span style={{ marginRight: '0.5rem' }}>💡</span>
             Average reading speed is 200-250 WPM. Bionic reading allows for 400+ WPM with practice.
-          </div>
+          </div> */}
         </div>
       </Card>
     </div>
