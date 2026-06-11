@@ -106,7 +106,15 @@ export const DocReader: React.FC<DocReaderProps> = ({ text, onComplete }) => {
           <Progress value={progressPercent} height="4px" />
         </div>
 
-        <article style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)', lineHeight: '2', flex: 1 }}>
+        <article style={{ 
+          fontSize: '1.25rem', 
+          color: 'var(--color-text-secondary)', 
+          lineHeight: '2', 
+          flex: 1,
+          textAlign: 'justify',
+          hyphens: 'auto',
+          wordBreak: 'break-word'
+        }}>
           {currentWords.map((word, i) => {
             if (/^\s+$/.test(word.original)) {
               if (word.original.includes('\n\n')) {

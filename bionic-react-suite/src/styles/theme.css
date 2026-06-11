@@ -160,13 +160,15 @@ body {
 
 /* Existing Component Overrides */
 .bionic-anchor {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
 .bionic-rest {
-  font-weight: 400;
-  color: var(--color-text-secondary);
+  font-weight: 300;
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
 }
 
 .focal-point {
