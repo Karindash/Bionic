@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: bionic-java-api
+
+# Bionic default configuration (overridable per request)
+bionic:
+  default-ratio: 40   # percentage of each word to bold (anchor length)
+  min-ratio: 1
+  max-ratio: 99
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
